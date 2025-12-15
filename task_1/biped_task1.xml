@@ -1,0 +1,83 @@
+<mujoco model="biped">
+    <compiler angle="radian"/>
+    <option gravity="0 0 -9.81" integrator="RK4" timestep="0.001" o_solref="-1e5 -1e3" o_friction="0.5">
+        <flag override="enable"/>
+    </option>
+
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072" />
+        <texture type="2d" name="floor" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8" width="300" height="300" />
+        <material name="floor" texture="floor" texuniform="true" texrepeat="5 5" reflectance="0.5"/>
+    </asset>
+
+    <visual>
+        <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0" />
+    </visual>
+
+    <worldbody>
+
+        <light name="spotlight0" mode="targetbodycom" target="torso" pos="0 0 10" cutoff="60" />
+        <light name="spotlight1" mode="targetbodycom" target="torso" pos="0.5 0 10" cutoff="60" />
+        <geom name="floor" type="plane" material="floor" size="10 10 0.1" pos="0 0 0" conaffinity="1" condim="4"/>
+
+        <!-- torso -->
+        <body name="torso" pos="0 0 0">
+            <joint type="free"/>
+            <!-- torso geometry, mass = 8 kg -->
+            <geom name="torso" type="box" size="0.075 0.02 0.125" mass="8" rgba="1 1 1 1"/>
+
+            <body name="l_thigh" pos="0 0 -0.235">
+                <joint name="l_thigh" type="hinge" pos="0 0 0.11" axis="0 1 0" limited="true" range="-2.0943951 0.523599" damping="0.1"/>
+                <geom name="l_thigh" type="box" size="0.01 0.01 0.11" mass="0.25" rgba="0 0 1 1"/>
+                <!-- <geom name="l_thigh" type="capsule" size="0.015 0.11" mass="0.25" rgba="0 0 1 1"/> -->
+
+                <body name="l_calf" pos="0 0 -0.22">
+                    <joint name="l_calf" type="hinge" pos="0 0 0.11" axis="0 1 0" limited="true" range="0 2.7925268032" damping="0.1"/>
+                    <geom name="l_calf" type="box" size="0.01 0.01 0.11" mass="0.25" rgba="0 0.5 1 1"/>
+                    <!-- <geom name="l_calf" type="capsule" size="0.015 0.11" mass="0.25" rgba="0 0.5 1 1"/> -->
+                        <geom name="l_foot" type="box" pos="0 0 -0.11" mass="0" size="0.01 0.01 0.00001" rgba="0 1 0 1"/>
+                        <!-- <geom name="l_foot" type="sphere" pos="0 0 -0.11" mass="0" size="0.015" rgba="0 1 0 1"/> -->
+                </body>
+            </body>
+
+            <body name="r_thigh" pos="0 0 -0.235">
+                <joint name="r_thigh" type="hinge" pos="0 0 0.11" axis="0 1 0" limited="true" range="-2.0943951 0.523599" damping="0.1"/>
+                <geom name="r_thigh" type="box" size="0.01 0.01 0.11" mass="0.25" rgba="1 0 0 1"/>
+                <!-- <geom name="r_thigh" type="capsule" size="0.015 0.11" mass="0.25" rgba="1 0 0 1"/> -->
+
+                <body name="r_calf" pos="0 0 -0.22">
+                    <joint name="r_calf" type="hinge" pos="0 0 0.11" axis="0 1 0" limited="true" range="0 2.7925268032" damping="0.1"/>
+                    <geom name="r_calf" type="box" size="0.01 0.01 0.11" mass="0.25" rgba="1 0.3 0 1"/>
+                    <!-- <geom name="r_calf" type="capsule" size="0.015 0.11" mass="0.25" rgba="1 0.3 0 1"/> -->
+                        <geom name="r_foot" type="box" pos="0 0 -0.11" mass="0" size="0.01 0.01 0.00001" rgba="0 1 0 1"/>
+                        <!-- <geom name="r_foot" type="sphere" pos="0 0 -0.11" mass="0" size="0.015" rgba="0 1 0 1"/> -->
+                </body>
+            </body>
+        </body>
+    </worldbody>
+
+	<equality>
+		<weld name="world_root" active="true" body1="torso" relpose="0 0 -2 1 0 0 0"/> 
+	</equality>
+
+    <actuator>
+        <motor name="l_thigh" joint="l_thigh"/>
+        <motor name="l_calf" joint="l_calf"/>
+        <motor name="r_thigh" joint="r_thigh"/>
+        <motor name="r_calf" joint="r_calf"/>
+    </actuator> 
+
+    <contact>
+        <exclude body1="l_thigh" body2="r_thigh"/>
+        <exclude body1="l_calf" body2="r_calf"/>
+        <exclude body1="l_calf" body2="r_thigh"/>
+        <exclude body1="l_thigh" body2="r_calf"/>
+    </contact>
+
+    <keyframe>
+        <key name="init" 
+            qpos="0 0 0.52 1 0 0 0 -0.0471975512 0.5707963268 -0.5235987756 0.5707963268"
+            qvel="0 0 0 0 0 0 0 0 0 0"
+        />
+  </keyframe>
+</mujoco>
