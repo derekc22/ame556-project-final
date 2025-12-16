@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<mujoco model="biped_robot">
+  <option timestep="0.001" gravity="0 0 -9.81" integrator="RK4" o_solref="-100000 -1000">
+    <flag contact="enable" gravity="enable" override="enable"/>
+  </option>
+  
+  <compiler angle="radian" coordinate="local" inertiafromgeom="false"/>
+  
+  <default>
+    <geom friction="0.5 0.005 0.0001" condim="3"/>
+    <joint damping="0.1" armature="0.01"/>
+  </default>
+  
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.6 0.6 0.6" rgb2="0 0 0" width="512" height="512"/>
+    <texture name="texplane" type="2d" builtin="checker" rgb1=".25 .25 .25" rgb2=".3 .3 .3" width="512" height="512" mark="cross" markrgb=".8 .8 .8"/>
+    <material name="matplane" reflectance="0.3" texture="texplane" texrepeat="1 1" texuniform="true"/>
+  </asset>
+
+  <contact>
+    <!-- Exclude all robot body collisions with each other -->
+    <exclude body1="trunk" body2="upper_leg1"/>
+    <exclude body1="trunk" body2="upper_leg2"/>
+    <exclude body1="trunk" body2="lower_leg1"/>
+    <exclude body1="trunk" body2="lower_leg2"/>
+    <exclude body1="trunk" body2="foot1"/>
+    <exclude body1="trunk" body2="foot2"/>
+    
+    <exclude body1="upper_leg1" body2="upper_leg2"/>
+    <exclude body1="upper_leg1" body2="lower_leg1"/>
+    <exclude body1="upper_leg1" body2="lower_leg2"/>
+    <exclude body1="upper_leg1" body2="foot1"/>
+    <exclude body1="upper_leg1" body2="foot2"/>
+    
+    <exclude body1="upper_leg2" body2="lower_leg1"/>
+    <exclude body1="upper_leg2" body2="lower_leg2"/>
+    <exclude body1="upper_leg2" body2="foot1"/>
+    <exclude body1="upper_leg2" body2="foot2"/>
+    
+    <exclude body1="lower_leg1" body2="lower_leg2"/>
+    <exclude body1="lower_leg1" body2="foot1"/>
+    <exclude body1="lower_leg1" body2="foot2"/>
+    
+    <exclude body1="lower_leg2" body2="foot1"/>
+    <exclude body1="lower_leg2" body2="foot2"/>
+    
+    <exclude body1="foot1" body2="foot2"/>
+  </contact>
+  
+  <worldbody>
+    <light directional="true" diffuse=".8 .8 .8" specular=".2 .2 .2" pos="0 0 5" dir="0 0 -1"/>
+    
+    <!-- Ground plane - Z is vertical -->
+    <geom name="ground" type="plane" size="50 50 0.1" rgba="0.8 0.8 0.8 1" material="matplane"/>
+    
+    <!-- Main body/trunk -->
+    <body name="trunk" pos="0 0 0.65">
+      <!-- Planar joints for 2D motion: x translation, z (vertical) translation, rotation about y -->
+      <joint name="root_x" type="slide" axis="1 0 0" limited="false"/>
+      <joint name="root_z" type="slide" axis="0 0 1" limited="false"/>
+      <joint name="root_theta" type="hinge" axis="0 1 0" limited="false"/>
+      
+      <!-- Trunk geometry: box with dimensions a=0.25m (height), b=0.15m (width/depth) -->
+      <geom name="trunk_geom" type="box" size="0.075 0.025 0.125" 
+            rgba="0.7 0.7 0.7 1" mass="8.0"/>
+      <inertial pos="0 0 0" mass="8.0" diaginertia="0.02167 0.02167 0.0075"/>
+      
+      <!-- Leg 1 (Left) -->
+      <body name="upper_leg1" pos="0 0 -0.125">
+        <!-- Hip joint q1: range -120° to 30° = -2.094 to 0.524 rad -->
+        <joint name="q1" type="hinge" axis="0 1 0" range="-2.094 0.524" 
+               damping="0.1" armature="0.01"/>
+        
+        <geom name="upper_leg1_geom" type="capsule" fromto="0 0 0 0 0 -0.22" size="0.015" 
+              rgba="0 0 1 1"/>
+        <inertial pos="0 0 -0.11" mass="0.25" diaginertia="0.00101667 0.00101667 0.00000625"/>
+        
+        <!-- Lower leg 1 -->
+        <body name="lower_leg1" pos="0 0 -0.22">
+          <!-- Knee joint q2: range 0° to 160° = 0 to 2.793 rad -->
+          <joint name="q2" type="hinge" axis="0 1 0" range="0 2.793" 
+                 damping="0.1" armature="0.01"/>
+          
+          <geom name="lower_leg1_geom" type="capsule" fromto="0 0 0 0 0 -0.22" size="0.015" 
+                rgba="1 0 0 1"/>
+          <inertial pos="0 0 -0.11" mass="0.25" diaginertia="0.00101667 0.00101667 0.00000625"/>
+          
+          <!-- Foot 1 with contact site -->
+          <body name="foot1" pos="0 0 -0.22">
+            <geom name="foot1_geom" type="sphere" size="0.02" rgba="0.2 0.2 0.8 1" 
+                  friction="0.9 0.005 0.0001"/>
+            <inertial pos="0 0 0" mass="0.01" diaginertia="0.00001 0.00001 0.00001"/>
+            <site name="foot1_site" pos="0 0 0" size="0.01" rgba="1 0 0 0.5"/>
+          </body>
+        </body>
+      </body>
+      
+      <!-- Leg 2 (Right) -->
+      <body name="upper_leg2" pos="0 0 -0.125">
+        <!-- Hip joint q3 -->
+        <joint name="q3" type="hinge" axis="0 1 0" range="-2.094 0.524" 
+               damping="0.1" armature="0.01"/>
+        
+        <geom name="upper_leg2_geom" type="capsule" fromto="0 0 0 0 0 -0.22" size="0.015" 
+              rgba="0 1 0 1"/>
+        <inertial pos="0 0 -0.11" mass="0.25" diaginertia="0.00101667 0.00101667 0.00000625"/>
+        
+        <!-- Lower leg 2 -->
+        <body name="lower_leg2" pos="0 0 -0.22">
+          <!-- Knee joint q4 -->
+          <joint name="q4" type="hinge" axis="0 1 0" range="0 2.793" 
+                 damping="0.1" armature="0.01"/>
+          
+          <geom name="lower_leg2_geom" type="capsule" fromto="0 0 0 0 0 -0.22" size="0.015" 
+                rgba="1 1 0 1"/>
+          <inertial pos="0 0 -0.11" mass="0.25" diaginertia="0.00101667 0.00101667 0.00000625"/>
+          
+          <!-- Foot 2 with contact site -->
+          <body name="foot2" pos="0 0 -0.22">
+            <geom name="foot2_geom" type="sphere" size="0.02" rgba="0.8 0.8 0.2 1" 
+                  friction="0.9 0.005 0.0001"/>
+            <inertial pos="0 0 0" mass="0.01" diaginertia="0.00001 0.00001 0.00001"/>
+            <site name="foot2_site" pos="0 0 0" size="0.01" rgba="0 1 0 0.5"/>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+  
+  <actuator>
+    <!-- Torque actuators with limits -->
+    <motor name="tau_q1" joint="q1" gear="1" ctrllimited="true" ctrlrange="-30 30"/>
+    <motor name="tau_q2" joint="q2" gear="1" ctrllimited="true" ctrlrange="-60 60"/>
+    <motor name="tau_q3" joint="q3" gear="1" ctrllimited="true" ctrlrange="-30 30"/>
+    <motor name="tau_q4" joint="q4" gear="1" ctrllimited="true" ctrlrange="-60 60"/>
+  </actuator>
+  
+  <sensor>
+    <!-- Joint positions -->
+    <jointpos name="q1_pos" joint="q1"/>
+    <jointpos name="q2_pos" joint="q2"/>
+    <jointpos name="q3_pos" joint="q3"/>
+    <jointpos name="q4_pos" joint="q4"/>
+    
+    <!-- Joint velocities -->
+    <jointvel name="q1_vel" joint="q1"/>
+    <jointvel name="q2_vel" joint="q2"/>
+    <jointvel name="q3_vel" joint="q3"/>
+    <jointvel name="q4_vel" joint="q4"/>
+    
+    <!-- Root position and orientation -->
+    <jointpos name="root_x_pos" joint="root_x"/>
+    <jointpos name="root_z_pos" joint="root_z"/>
+    <jointpos name="root_theta_pos" joint="root_theta"/>
+    
+    <!-- Root velocities -->
+    <jointvel name="root_x_vel" joint="root_x"/>
+    <jointvel name="root_z_vel" joint="root_z"/>
+    <jointvel name="root_theta_vel" joint="root_theta"/>
+    
+    <!-- Contact forces -->
+    <touch name="foot1_contact" site="foot1_site"/>
+    <touch name="foot2_contact" site="foot2_site"/>
+
+  </sensor>
+</mujoco>
