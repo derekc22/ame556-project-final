@@ -174,11 +174,10 @@ class Biped():
         if not self.first_contact and self.feet_contact:
             self.first_contact = True
         
-        self.u = u #self.set_tau_limits(u)
-        # self.u = self.set_tau_limits(u)
+        self.u = self.set_tau_limits(u)
         
         self.d.ctrl = self.u
-        # self.check_limits()
+        self.check_limits()
 
 
 
@@ -530,6 +529,12 @@ class Biped():
         2: double-support safety / recovery
         """
         
+        self.d.qpos[[7, 9]] = np.clip(self.d.qpos[[7, 9]], self.thigh_qpos_min, self.thigh_qpos_max)
+        self.d.qpos[[8, 10]] = np.clip(self.d.qpos[[8, 10]], self.calf_qpos_min, self.calf_qpos_max)
+
+        self.d.qvel[[6, 8]] = np.clip(self.d.qvel[[6, 8]], -self.thigh_qvel_limit, self.thigh_qvel_limit)
+        self.d.qvel[[7, 9]] = np.clip(self.d.qvel[[7, 9]], -self.calf_qvel_limit, self.calf_qvel_limit)
+
         if not self.first_contact: return np.zeros(self.m.nu)
         
         # 1. Torso pitch from base quaternion

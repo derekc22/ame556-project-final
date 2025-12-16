@@ -14,7 +14,7 @@ from biped_task1 import Biped
 
 def main():
 
-    xml = "biped_task1.xml"
+    xml = "./task1/biped_task1.xml"
     biped = Biped(xml)
 
     default_qpos = np.array(

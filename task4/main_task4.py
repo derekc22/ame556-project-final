@@ -93,7 +93,7 @@ def plot(t, data_arr, ctrl_mode):
 
 def main():
     
-    xml = "biped_task4.xml"
+    xml = "./task4/biped_task4.xml"
     ctrl_mode = "qp_pd_climb"
     biped = Biped(xml, ctrl_mode)
     
