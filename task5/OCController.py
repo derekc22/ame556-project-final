@@ -310,7 +310,7 @@ def flightLCon(state: np.ndarray, P_foot: np.ndarray, dP_foot: np.ndarray,
         Py_dot_d = dp[1]
     
     elif gait == "step_off_flight":
-        Px_d, Py_d, Px_dot_d, Py_dot_d = fall_flight_traj(p, dp, theta, params)
+        Px_d, Py_d, Px_dot_d, Py_dot_d = trajFF(p, dp, theta, params)
     
     elif gait == "pre_landing":
         landing_h = hTerr(p[0] + params.preland.lookahead, params)
@@ -320,7 +320,7 @@ def flightLCon(state: np.ndarray, P_foot: np.ndarray, dP_foot: np.ndarray,
         Py_dot_d = params.preland.descent_vel
     
     elif gait == "holeFlight":
-        Px_d, Py_d, Px_dot_d, Py_dot_d = holeFlight_traj(p, dp, theta, params)
+        Px_d, Py_d, Px_dot_d, Py_dot_d = trajHF(p, dp, theta, params)
     
     else:
         Px_d = p[0]
@@ -335,7 +335,7 @@ def flightLCon(state: np.ndarray, P_foot: np.ndarray, dP_foot: np.ndarray,
     return F
 
 
-def fall_flight_traj(p: np.ndarray, dp: np.ndarray, theta: float,
+def trajFF(p: np.ndarray, dp: np.ndarray, theta: float,
                         params: OCParams) -> Tuple[float, float, float, float]:
     """Generate foot trajectory during step-off flight"""
     
@@ -354,7 +354,7 @@ def fall_flight_traj(p: np.ndarray, dp: np.ndarray, theta: float,
     return Px_d, Py_d, dp[0], dp[1]
 
 
-def holeFlight_traj(p: np.ndarray, dp: np.ndarray, theta: float,
+def trajHF(p: np.ndarray, dp: np.ndarray, theta: float,
                     params: OCParams) -> Tuple[float, float, float, float]:
     """Generate foot trajectory during gap flight"""
     
